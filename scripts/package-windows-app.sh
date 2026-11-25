@@ -112,7 +112,18 @@ LDFLAGS="$(./scripts/get_version.sh ldflags) -X 'google.golang.org/protobuf/refl
 # 构建前校验许可清单（与 release-lite.yml 一致；wails 打包会带上 licenses/）
 bash ./scripts/check-license-bundle.sh
 
-(cd cmd/desktop && wails build -clean \
+    # WebView2 离线安装器（嵌入 NSIS；离线机器装 WeKnora 时自动静默装运行时）
+    WV2="cmd/desktop/build/windows/installer/webview2/WebView2RuntimeX64.exe"
+    if [ ! -s "$WV2" ]; then
+        mkdir -p "$(dirname "$WV2")"
+        for i in 1 2 3 4 5; do
+            curl -sL --fail --max-time 240 -o "$WV2.tmp" \
+                "https://go.microsoft.com/fwlink/p/?LinkId=2099617" && mv "$WV2.tmp" "$WV2" && break
+            sleep 8
+        done
+    fi
+
+    (cd cmd/desktop && wails build -clean \
     -tags "sqlite_fts5" \
     -platform "windows/${ARCH}" \
     ${NSIS_FLAG} \

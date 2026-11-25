@@ -195,6 +195,21 @@ jobs:
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
+      # 下载 WebView2 离线安装器（Standalone x64），供 NSIS 嵌入：
+      # 离线部署机器无法在线安装运行时（wails 默认 bootstrapper 需联网）
+      - name: Download WebView2 offline installer
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p cmd/desktop/build/windows/installer/webview2
+          for i in 1 2 3 4 5; do
+            curl -sL --fail --max-time 240 -o cmd/desktop/build/windows/installer/webview2/WebView2RuntimeX64.exe \
+              "https://go.microsoft.com/fwlink/p/?LinkId=2099617" && break
+            sleep 8
+          done
+          test -s cmd/desktop/build/windows/installer/webview2/WebView2RuntimeX64.exe || \
+            echo "::warning::WebView2 offline installer download failed; NSIS falls back to online bootstrapper"
+
       - name: Pre-compile Go packages (Windows)
         if: runner.os == 'Windows'
         shell: bash
