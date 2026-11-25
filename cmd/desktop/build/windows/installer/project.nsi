@@ -89,7 +89,7 @@ Section
     ; (Evergreen Standalone x64 at ..\webview2\WebView2RuntimeX64.exe, placed
     ; at build time) so machines without internet can install it. Fall back
     ; to the wails bootstrapper macro (requires internet) otherwise.
-    !if FileExists "..\webview2\WebView2RuntimeX64.exe"
+    !if /FileExists "..\webview2\WebView2RuntimeX64.exe"
         SetRegView 64
         ReadRegStr $0 HKLM "SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" "pv"
         ${If} $0 == ""
